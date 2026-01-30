@@ -10,10 +10,7 @@ export default {
       await command.execute(interaction);
     } catch (err) {
       console.error(err);
-      await interaction.reply({
-        content: "Something went wrong :( :( :(",
-        ephemeral: true,
-      });
+      await interaction.reply({ content: "Something went wrong :(", ephemeral: true });
     }
-  },
+  }
 };
