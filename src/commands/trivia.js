@@ -30,6 +30,7 @@ export default {
     .setDescription("Start a trivia game!"),
 
   async execute(interaction) {
+
     await interaction.deferReply();
 
     const randomIndex = Math.floor(Math.random() * questions.length);
