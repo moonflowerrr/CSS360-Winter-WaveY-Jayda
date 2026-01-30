@@ -25,7 +25,11 @@ const getWelcomeMessage = (userId) => {
   */
   return {
     content: `Welcome ${userMention(userId)},
-    Welcome to my server! Enjoy!
+    to the WaveY Trivia Bot server! To play the game
+    you will be given trivia questions and four answers
+    to choose from. I will then tell you if you are wrong or right.
+    For help type '/' to see my commands. Have fun!
+
   `,
   };
 };
