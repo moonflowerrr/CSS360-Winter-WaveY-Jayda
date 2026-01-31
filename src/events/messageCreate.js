@@ -1,4 +1,5 @@
 import { activeTrivia } from "../helpers/activeTrivia.js";
+import { evaluateAnswer } from "../helpers/evaluateAnswer.js";
 
 export default {
   name: "messageCreate",
@@ -6,20 +7,19 @@ export default {
     if (message.author.bot) return;
 
     const state = activeTrivia.get(message.author.id);
-    if (!state) return; // user isn't currently answering a trivia question
+    if (!state) return;
 
-    const input = message.content.trim().toUpperCase();
-    const letter = input[0];
+    const userAnswer = message.content.trim();
 
-    if (!["A", "B", "C", "D"].includes(letter)) return;
+    // correctAnswer can be "A", "B", "C", or "D"
+    const { isCorrect, message: response } = evaluateAnswer(
+      userAnswer,
+      state.correctAnswer
+    );
 
-    if (letter === state.correctLetter) {
-      await message.reply("✅ Correct!");
-    } else {
-      await message.reply(`❌ Incorrect. The correct answer was **${state.correctLetter}**.`);
-    }
+    await message.reply(response);
 
-    // Clear the active question so they can't keep guessing
+    // stop further guesses
     activeTrivia.delete(message.author.id);
   },
 };

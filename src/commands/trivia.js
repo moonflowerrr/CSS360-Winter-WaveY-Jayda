@@ -36,12 +36,17 @@ export default {
     const randomIndex = Math.floor(Math.random() * questions.length);
     const q = questions[randomIndex];
 
+
     const letters = ["A", "B", "C", "D"];
-    const correctLetter = letters[q.correctIndex];
+    const correctAnswer = letters[q.correctIndex];
+
+activeTrivia.set(interaction.user.id, {
+  correctAnswer, // e.g. "C"
+});
+
 
     // Store correct answer for THIS user
-    activeTrivia.set(interaction.user.id, { correctLetter });
-
+    activeTrivia.set(interaction.user.id, { correctAnswer });
     const formattedOptions = q.options
       .map((opt, i) => `**${letters[i]}.** ${opt}`)
       .join("\n");
