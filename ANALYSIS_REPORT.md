@@ -24,8 +24,11 @@ By:
 Giselle McNeill 
 02/13/2026
 
-![Test coverage](test coverage.jpg)
-Test Coverage Analysis (c8 + Mocha) : By Aditi Menon
+![Test coverage](testcoverage.jpg)
+
+
+
+** Test Coverage Analysis (c8 + Mocha) : By Aditi Menon**
 
 To evaluate how thoroughly our automated test suite exercises the WaveY codebase, we ran test coverage using the c8 coverage tool integrated with Mocha. This analysis measured the percentage of executed statements, branches, functions, and lines across all source files in the src directory.
 
