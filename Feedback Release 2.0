@@ -1,0 +1,36 @@
+Group 1 Feedback: 
+
+Feedback for WaveY
+The WaveY trivia bot was a fun and engaging single-player experience that was easy to
+understand and interact with as the group explained it. The use of a starter command, category
+selection, interactive buttons, and visual feedback (such as green for correct answers and red for
+incorrect ones) makes the bot very user friendly and visually clear for players which makes the
+experience to the game after the demo better for us as users. The welcome message with
+instructions helps new users quickly understand how to start playing . One potential
+improvement would be adjusting the timeout duration, as it seemed to end a bit quickly and
+could interrupt the flow of answering questions, as it was kind of a problem in the demo when
+demonstrating it. Overall I really liked the bot itself it was fun creative and the functionalities
+seems simple to use and wouldn’t be a burden when using the bot itself
+this is feedback from classmates, I should have said
+WaveY Bot
+
+WaveY is a trivia game bot with four different categories. The bot starts with a welcome message and then you use /trivia to start the game. I liked how the bot clearly shows feedback. Correct answers show up in green and wrong answers show up in red, which makes it easy to see how you did. The score is shown during the game, and if you get 50% or more correct it shows that you won. I also liked that if the game times out it still ends the game properly and shows your score and best streak. Another good design choice is that the game runs in an isolated environment so other people in the Discord channel can’t interfere. One suggestion would be maybe adding difficulty levels or more rounds so players can make the game more challenging if they want.
+WAVEY FEEDBACK
+The WAVEY trivia bot has a solid foundation, especially with the session-locking feature that
+prevents multiple games from overlapping. One specific opportunity for improvement would be
+to expand the scoring system to include a "time-bonus" variable, rewarding players who answer
+more quickly to add a layer of difficulty. Additionally, while the exit command is great for user
+experience, ensuring the bot can gracefully handle a mid-game disconnection without locking
+the user out of a future session would be a good edge-case to test. Overall, the streak-tracking
+adds a nice competitive element that makes the single-player experience feel more rewarding
+Wavey Feedback:
+
+Trivia Bot, single player trivia game. I really like the UI and the scoring logic this bot provides. The extra features such as the streak and all the funny GIFS are interesting and fun. I do think a Discord Bot with multiple people in a server should be multiplayer or have some features that bring the people together such as maybe a leaderboard. The winning percentage being 50% is low in my opinion and maybe should be increased or provide an option for users to increase it for a more competitive experience. The timeout logic being 30 seconds is fast. I would advise increasing the time, or the bot should provide the user with a pause function to increase the amount of time they have in case they have to go for a while. But I do think this is a fun idea and an amazing project.
+WaveY
+The bot looks thought through with an interesting gameplay loop and is easy to navigate. It seems
+like the timeout features seem to be a little too short (timed out twice), along with this, the rules
+seemed to be lengthy compared to the gameplay. I feel like the developers already put effort into
+making the loop easy to use and understand, so it might be counterintuitive to be so wordy. Other
+than that, the bot looks fun and well-developed.
+
+Group 2 Feedback: 
