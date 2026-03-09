@@ -9,8 +9,9 @@ import {
 import { activeTrivia } from "../helpers/activeTrivia.js";
 import { evaluateAnswer } from "../helpers/evaluateAnswer.js";
 import { showScoreboard } from "../helpers/scoreboard.js";
+import { offerMiniChallenge } from "../helpers/miniChallenge.js";
 
-const questions = [
+export const questions = [
   // STEM (20 questions)
   { question: "Which data structure follows FIFO?", options: ["Stack", "Queue", "Tree", "Graph"], correctIndex: 1, category: "stem" },
   { question: "Who developed the theory of relativity?", options: ["Newton", "Tesla", "Einstein", "Galileo"], correctIndex: 2, category: "stem" },
@@ -129,10 +130,14 @@ export default {
       Welcome ${userMention(userId)}, to the **WaveY Trivia Bot**! 🚀
       📢 **READ BEFORE YOU START PLAYING:** 📢
       1) To start off, you can choose the category you want to play in, and then we will get started!
-      2) To play the game, you will be given trivia questions and **four answers** to choose from. You need a 50% or higher to win, so choose wisely!   
+      2) To play the game, you will be given trivia questions and **four answers** to choose from.   
       3) I will then tell you if you are ✅ **correct** or ❌ **incorrect**, and tell you the correct answer.
       4) You can play up to 10 questions per game, and your score will be tracked along the way.
-      5) You also have 30 seconds to answer each question, so be quick! ⏰ 
+      5) If you are lucky you could be offered up to two bonus questions! 
+          Pop Quiz: A random question from any category for 1 extra point.
+          Double Points: A question from your chosen category that is worth 2 points instead of 1!
+        You will be given 30 seconds to accept or decline the bonus question 🙋
+      6) You also have 30 seconds to answer each question, so be quick! ⏰ 
       All the best, and may the trivia odds be ever in your favor! 🏆
       **Note:** If you want to exit the game early, use the command "/exit" to end your session and see your final score.
       **Have fun!** 🥳`.trim().split('\n').map(line => line.trim()).join('\n');
@@ -236,41 +241,88 @@ export default {
     return;
   }
 
-  // Cap questions at 10 and implement a timer for each question
-  while (true) {
-    const session = activeTrivia.get(userId);
-    if (!session) break;
+  //MINI CHALLENGE VARIABLES - initialize in session after category selection
+  // After category selection, offer the mini challenge
+  const session = activeTrivia.get(userId);
+  session.miniChallengeCount = 0;
+  session.miniChallengeScore = 0; 
+  activeTrivia.set(userId, session);
 
-    const categoryQuestions = questions.filter(q => q.category === session.category);
+//main trivia logic
+while (true) {
+  const session = activeTrivia.get(userId);
+  if (!session) break;
 
-    // stop after 10 questions
-    if (session.questionCount >= 10) break;
-
-    // make sure session.asked exists (in case things got moved)
-    if (!Array.isArray(session.asked)) session.asked = [];
-
-    // stop if we run out of unique questions
-    if (session.asked.length >= categoryQuestions.length) break;
-
-    // pick an unused question index
-    let randomIndex = Math.floor(Math.random() * categoryQuestions.length);
-    while (session.asked.includes(randomIndex)) {
-      randomIndex = Math.floor(Math.random() * categoryQuestions.length);
-    }
-
-    session.asked.push(randomIndex);
+  // offer mini challenge before next round
+  if (session.miniChallengeCount < 2 && Math.random() < 0.2) {
+    session.miniChallengeCount += 1;
     activeTrivia.set(userId, session);
 
-    const q = categoryQuestions[randomIndex];
+    try {
+      // Pause the loop until mini challenge is done
+    const result = await offerMiniChallenge(interaction, session.miniChallengeScore, session.category);
+// result now contains both points AND sessionData
+const { points: newMiniScore, sessionData: resolvedSession } = result;
 
-    // ask question; if user explicitly exited, end session
-    const endedSession = await askQuestion(interaction, userId, q);
-    if (endedSession) break;
-  }
-  await showScoreboard(interaction);
+// EXIT CHECK
+if (!resolvedSession || resolvedSession.exiting) {
+  await showScoreboard(interaction, {
+    score: resolvedSession.score,
+    questionCount: resolvedSession.questionCount,
+    miniChallengeScore: resolvedSession.miniChallengeScore
+  });
   activeTrivia.delete(userId);
-  },
-};
+  break;
+}
+
+const bonusEarned = newMiniScore - session.miniChallengeScore;
+session.miniChallengeScore = newMiniScore;
+session.score += bonusEarned;
+activeTrivia.set(userId, session);
+
+    } catch (err) {
+      console.error("Mini-challenge failed:", err);
+    }
+  }
+
+
+  // Filter questions for this category
+  const categoryQuestions = questions.filter(q => q.category === session.category);
+
+  // Stop after 10 questions
+  if (session.questionCount >= 10) break;
+
+  // Ensure session.asked exists
+  if (!Array.isArray(session.asked)) session.asked = [];
+
+  // Stop if all questions have been asked
+  if (session.asked.length >= categoryQuestions.length) break;
+
+  // Pick a random unused question
+  let randomIndex = Math.floor(Math.random() * categoryQuestions.length);
+  while (session.asked.includes(randomIndex)) {
+    randomIndex = Math.floor(Math.random() * categoryQuestions.length);
+  }
+  session.asked.push(randomIndex);
+  activeTrivia.set(userId, session);
+
+  const q = categoryQuestions[randomIndex];
+
+  // Ask the question and pause the loop until answered
+  const endedSession = await askQuestion(interaction, userId, q);
+  if (endedSession) break;
+}
+
+// --- SHOW FINAL SCOREBOARD ---
+const finalSession = activeTrivia.get(userId);
+if (finalSession) {
+  await showScoreboard(interaction, {
+    score: finalSession.score,
+    questionCount: finalSession.questionCount,
+    miniChallengeScore: finalSession.miniChallengeScore
+  });
+}
+activeTrivia.delete(userId);
 
 async function askQuestion(interaction, userId, q) {
   const session = activeTrivia.get(userId);
@@ -363,7 +415,7 @@ async function askQuestion(interaction, userId, q) {
 
       // Edit the original message with the new colors and streak
       await buttonInteraction.editReply({
-        content: `🧠 **Trivia Question:**\n${q.question}\n${result.message}${streakDisplay}\n\n⭐ Score: ${session.score}/${session.questionCount}`,
+        content: `🧠 **Trivia Question:**\n${q.question}\n${result.message}${streakDisplay}\n\n⭐ Score: ${session.score}/${session.questionCount}\n\n 🎁 Bonus Points: ${session.miniChallengeScore || 0} \n\n`,
         components: [updatedRow],
       });
 
@@ -385,7 +437,7 @@ async function askQuestion(interaction, userId, q) {
           const disabledRow = new ActionRowBuilder().addComponents(
             row.components.map((button) =>
               ButtonBuilder.from(button).setDisabled(true)
-            )
+          )
           );
 
           await questionMessage.edit({
@@ -399,4 +451,4 @@ async function askQuestion(interaction, userId, q) {
         }
     });
   });
-}
+}}};

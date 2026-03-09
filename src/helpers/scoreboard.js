@@ -33,6 +33,7 @@ export function showScoreboard(interaction) {
       `${userMention(userId)}, your trivia game has ended!\n\n` +
       `Questions answered: **${questions}**\n` +
       `Your score: **${score}/${questions}** (**${percentLabel}**)\n` +
+      `Bonus Points: **${session.miniChallengeScore}**\n` +
       `Best Streak: **${maxStreak}** ${streakIcon}\n\n` +
       (didWin
         ? `✅ Congrats! You scored **50%+**!`
