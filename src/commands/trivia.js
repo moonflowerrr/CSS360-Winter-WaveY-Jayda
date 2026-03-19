@@ -9,7 +9,8 @@ import {
 import { activeTrivia } from "../helpers/activeTrivia.js";
 import { evaluateAnswer } from "../helpers/evaluateAnswer.js";
 import { showScoreboard } from "../helpers/scoreboard.js";
-import { offerMiniChallenge } from "../helpers/miniChallenge.js";
+import { saveAttempt } from "../helpers/leaderboard.js";
+import { getLeaderboard } from "../helpers/leaderboard.js";
 
 export const questions = [
   // STEM (20 questions)
@@ -100,7 +101,22 @@ export const questions = [
   { question: "Which video game features Link as the main character?", options: ["The Legend of Zelda","Mario Kart","Sonic","Fortnite"], correctIndex: 0, category: "pop_culture" }
 ];
 
+ const funFacts = [
+  "Honey never spoils.",
+  "Octopuses have three hearts.",
+  "Bananas are berries, but strawberries are not.",
+  "A day on Venus is longer than a year on Venus.",
+  "Sharks existed before trees.",
+  "The Eiffel Tower gets taller in summer because metal expands in heat.",
+  "Some cats are allergic to humans.",
+  "Wombat poop is cube-shaped.",
+  "The shortest war in history lasted 38 to 45 minutes.",
+  "There are more possible iterations of a game of chess than there are atoms in the known universe.",
+ ];
+
 const letters = ["A", "B", "C", "D"]; // moved to global
+
+
 
 export default {
   data: new SlashCommandBuilder()
@@ -141,6 +157,8 @@ export default {
       All the best, and may the trivia odds be ever in your favor! 🏆
       **Note:** If you want to exit the game early, use the command "/exit" to end your session and see your final score.
       **Have fun!** 🥳`.trim().split('\n').map(line => line.trim()).join('\n');
+
+
 
     // Store correct answer for THIS user
     activeTrivia.set(userId, {
@@ -308,21 +326,48 @@ activeTrivia.set(userId, session);
 
   const q = categoryQuestions[randomIndex];
 
-  // Ask the question and pause the loop until answered
-  const endedSession = await askQuestion(interaction, userId, q);
-  if (endedSession) break;
-}
+    // ask question; if user explicitly exited, end session
+    const endedSession = await askQuestion(interaction, userId, q);
+    if (endedSession) break;
+  }
+   const finalSession = activeTrivia.get(userId);
 
-// --- SHOW FINAL SCOREBOARD ---
-const finalSession = activeTrivia.get(userId);
-if (finalSession) {
-  await showScoreboard(interaction, {
-    score: finalSession.score,
-    questionCount: finalSession.questionCount,
-    miniChallengeScore: finalSession.miniChallengeScore
+  if (finalSession) {
+  const correct = finalSession.score;
+  const total = finalSession.questionCount;
+  const percent = total === 0 ? 0 : (correct / total) * 100;
+  console.log("FINAL SAVE BLOCK:", interaction.guildId, interaction.user.id, interaction.user.username);
+
+  saveAttempt(
+    interaction.guildId,
+    interaction.user.id,
+    interaction.member?.displayName || interaction.user.username,
+    correct,
+    total
+  );
+
+  await showScoreboard(interaction);
+
+  const leaderboardButton = new ButtonBuilder()
+    .setCustomId("view_leaderboard")
+    .setLabel("View Leaderboard")
+    .setStyle(ButtonStyle.Primary);
+
+  const row = new ActionRowBuilder().addComponents(leaderboardButton);
+
+  const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+
+  await interaction.followUp({
+    content:
+      `📊 Your most recent score was **${percent.toFixed(1)}%** (${correct}/${total}).\n\n` +
+      `💡 **Fun Fact:** ${randomFact}`,
+    components: [row],
   });
 }
-activeTrivia.delete(userId);
+
+  activeTrivia.delete(userId);
+  },
+};
 
 async function askQuestion(interaction, userId, q) {
   const session = activeTrivia.get(userId);
@@ -451,4 +496,4 @@ async function askQuestion(interaction, userId, q) {
         }
     });
   });
-}}};
+};
