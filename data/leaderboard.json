@@ -1,0 +1,27 @@
+{
+  "1460739755678634219": {
+    "862590471783186432": {
+      "username": "Audrey",
+      "attempts": [
+        {
+          "percent": 120,
+          "correct": 12,
+          "total": 10,
+          "playedAt": 1773976996753
+        },
+        {
+          "percent": 80,
+          "correct": 4,
+          "total": 5,
+          "playedAt": 1773977082307
+        },
+        {
+          "percent": 130,
+          "correct": 13,
+          "total": 10,
+          "playedAt": 1773977358952
+        }
+      ]
+    }
+  }
+}
