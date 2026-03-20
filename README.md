@@ -26,7 +26,7 @@ The bot lets users start a personal trivia session via a slash command. Each gam
 - Bonus round questions which do not affect overall score or number of questions that can be attemoted
 - Automatic progression through questions
 - The final scoreboard and results is displayed after 10 questions
-- A leaderboard which ranks all the attempts of the user in the current session
+- A leaderboard which ranks all the attempts of users who have interacted with the bot
 - Exit command to end game early with "/exit"
 - Session management to prevent faulty gameplay
 
@@ -35,7 +35,7 @@ The bot lets users start a personal trivia session via a slash command. Each gam
 - Users are now able to see a timer indicating the number of seconds (starts at 45s) they have left before the session times out across the questions, category selection, bonus round, difficulty level.
 - Mini challenges (bonus rounds) scattered throughout the game
 - Threshold for winning is now higher at 75%.
-- A leaderboard which appears at the end of every game which ranks all the attempts of the user in the ongoing session.
+- A leaderboard which appears at the end of every game which ranks all the attempts of multiple users.
 - A fun fact accompanying the leaderboard button.
 
 
